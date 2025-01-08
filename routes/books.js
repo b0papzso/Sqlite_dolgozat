@@ -27,6 +27,7 @@ router.get("/:id", async(req, res, next) =>{
 
 router.post("/", async (req, res, next) => {
     try {
+        console.log(JSON.stringify(req.body))
         const result = await dbRun("INSERT INTO books (title, author, description, year) VALUES (?, ?, ?, ?);", [req.body.title, req.body.author, req.body.description, req.body.year]);
         res.status(201).json({ id: result.lastID, ...req.body });
     } catch (err) {
@@ -40,7 +41,7 @@ router.put("/:id", async (req, res, next) => {
         if (!book) return res.status(404).json({ message: "Könyv nem található" });
 
         await dbRun("UPDATE books SET title = ?,author = ?, description = ?, year = ? WHERE id = ?;", 
-            [req.body.title, req.body.author || book.title, book.author, req.body.description || book.description, req.params.id]);
+            [req.body.title || book.title, req.body.author || book.author, req.body.description || book.description, book.year, req.params.id]);
         res.status(200).json({ id: req.params.id, title: req.body.title, author: req.body.author || book.title,  year: req.body.year });
     } catch (err) {
         next(err);
